@@ -37,7 +37,7 @@ eval_batch_size = 8
 grad_accum = 2
 ckpt_path = 'models/text_2.pt'
 model_type = "text"
-dataset_path = 'datasets/joe_biden_state_of_union/'
+dataset_path = 'datasets/'
 logging_dir = 'logs/'
 log_with = 'wandb'
 hubert_path = 'data/models/hubert/hubert.pt'
@@ -97,16 +97,20 @@ SEMANTIC_INFER_TOKEN = 129_599
 
 MAX_SEMANTIC_LEN = 511
 
-SAMPLE_RATE = 24_000
+SAMPLE_RATE = 22_050
 CHANNELS = 1
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 USE_SMALL_MODELS = os.environ.get("SERP_USE_SMALL_MODELS", False)
 
-default_cache_dir = os.path.join(os.path.expanduser("~"), ".cache")
+# default_cache_dir = os.path.join(os.path.expanduser("~"), ".cache")
+default_cache_dir = "/content/drive/MyDrive/.cache"
+os.environ["XDG_CACHE_HOME"] = default_cache_dir
 CACHE_DIR = os.path.join(os.getenv("XDG_CACHE_HOME", default_cache_dir), "serp", "bark_v0")
+logger.info(f"using XDG_CACHE_HOME= {os.environ['XDG_CACHE_HOME']}")
+logger.info(f"using CACHE_DIR= {CACHE_DIR}")
 
 
 def _clear_cuda_cache():
@@ -357,7 +361,13 @@ for wav_path, txt in load_filepaths_and_text(path + 'train.txt'):
     codes = codes.cpu().numpy()
 
     # save tokens
-    np.savez_compressed(os.path.join(path, 'tokens', os.path.basename(wav_path).replace('.wav', '.npz')), fine=codes, coarse=codes[:2, :], semantic=semantic_tokens)
+    destination_filename = os.path.basename(wav_path).replace('.wav', '.npz')
+    relative_path = os.path.dirname(os.path.relpath(wav_path, 'datasets/wavs'))
+    dir_name = os.path.join(path, 'tokens', relative_path)
+    os.makedirs(dir_name, exist_ok=True)
+    full_destination_path = os.path.join(dir_name, destination_filename)
+    np.savez_compressed(full_destination_path, fine=codes, coarse=codes[:2, :], semantic=semantic_tokens)
+    # np.savez_compressed(os.path.join(path, 'tokens', os.path.basename(wav_path).replace('.wav', '.npz')), fine=codes, coarse=codes[:2, :], semantic=semantic_tokens)
 
 # rewrite train.txt with valid lines
 with open(path + 'train_valid.txt', 'w', encoding='utf-8') as f:
@@ -388,7 +398,13 @@ for wav_path, txt in load_filepaths_and_text(path + 'valid.txt'):
     codes = codes.cpu().numpy()
 
     # save tokens
-    np.savez_compressed(os.path.join(path, 'tokens', os.path.basename(wav_path).replace('.wav', '.npz')), fine=codes, coarse=codes[:2, :], semantic=semantic_tokens)
+    destination_filename = os.path.basename(wav_path).replace('.wav', '.npz')
+    relative_path = os.path.dirname(os.path.relpath(wav_path, 'datasets/wavs'))
+    dir_name = os.path.join(path, 'tokens', relative_path)
+    os.makedirs(dir_name, exist_ok=True)
+    full_destination_path = os.path.join(dir_name, destination_filename)
+    np.savez_compressed(full_destination_path, fine=codes, coarse=codes[:2, :], semantic=semantic_tokens)
+    # np.savez_compressed(os.path.join(path, 'tokens', os.path.basename(wav_path).replace('.wav', '.npz')), fine=codes, coarse=codes[:2, :], semantic=semantic_tokens)
 
 # rewrite valid.txt with valid lines
 with open(path + 'valid_valid.txt', 'w', encoding='utf-8') as f:

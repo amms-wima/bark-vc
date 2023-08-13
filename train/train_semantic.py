@@ -37,7 +37,7 @@ eval_batch_size = 8
 grad_accum = 2
 ckpt_path = 'models/text_2.pt'
 model_type = "text"
-dataset_path = 'datasets/joe_biden_state_of_union/'
+dataset_path = 'datasets/'
 logging_dir = 'logs/'
 log_with = 'wandb'
 hubert_path = 'data/models/hubert/hubert.pt'
@@ -97,16 +97,20 @@ SEMANTIC_INFER_TOKEN = 129_599
 
 MAX_SEMANTIC_LEN = 511
 
-SAMPLE_RATE = 24_000
+SAMPLE_RATE = 22_050
 CHANNELS = 1
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 USE_SMALL_MODELS = os.environ.get("SERP_USE_SMALL_MODELS", False)
 
-default_cache_dir = os.path.join(os.path.expanduser("~"), ".cache")
+# default_cache_dir = os.path.join(os.path.expanduser("~"), ".cache")
+default_cache_dir = "/content/drive/MyDrive/.cache"
+os.environ["XDG_CACHE_HOME"] = default_cache_dir
 CACHE_DIR = os.path.join(os.getenv("XDG_CACHE_HOME", default_cache_dir), "serp", "bark_v0")
+logger.info(f"using XDG_CACHE_HOME= {os.environ['XDG_CACHE_HOME']}")
+logger.info(f"using CACHE_DIR= {CACHE_DIR}")
 
 
 def _clear_cuda_cache():
