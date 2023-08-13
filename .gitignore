@@ -1,4 +1,6 @@
 __pycache__/
+.venv/
+.bark-vc (copy 1)/
 *.wav
 _temp/
 models/
