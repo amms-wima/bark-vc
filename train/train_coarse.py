@@ -320,7 +320,7 @@ accelerator = Accelerator(
     gradient_accumulation_steps=grad_accum,
     mixed_precision=mixed_precision,
     log_with=log_with,
-    logging_dir=logging_dir,
+    # logging_dir=logging_dir,
 )
 device = accelerator.device
 
